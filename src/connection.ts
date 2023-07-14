@@ -7,4 +7,5 @@ export default class Connection
     ipAddress: string;
     apiKey: string;
     websocket: HostipWebSocket;
+    sockets?: Map<string, HostipWebSocket>;
 }
