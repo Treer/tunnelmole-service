@@ -13,7 +13,6 @@ const handleRequest = async function(request : Request, response : Response) {
     const proxy = Proxy.getInstance();
     const url = new URL('https://' + request.headers.host);
     const hostname = url.hostname;
-    const requestId = nanoid();
     const connection : Connection = proxy.findConnectionByHostname(hostname);
 
     if (typeof connection === 'undefined') {
@@ -33,6 +32,7 @@ const handleRequest = async function(request : Request, response : Response) {
     // Unless its just an empty object, then set it to an empty string
     const body = JSON.stringify(request.body) === JSON.stringify({}) ? '' : request.body.toString('base64');
 
+    const requestId = nanoid();
     const forwardedRequest : ForwardedRequestMessage = {
         requestId,
         type: "forwardedRequest",
