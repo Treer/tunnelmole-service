@@ -127,6 +127,10 @@ function socketOverSocket(
   }
 
   function openDatatunnel() {
+    
+    console.log("typeof websocket.dataTunnel " + websocket.dataTunnel);
+
+
     // Only open one data tunnel per websocket
     if (typeof websocket.dataTunnel !== "undefined") return;
 
@@ -135,10 +139,17 @@ function socketOverSocket(
     const proxy = Proxy.getInstance();
     const url = new URL("https://" + request.headers.host);
     const hostname = url.hostname;
-    const connection: Connection = proxy.findConnectionByHostname(hostname);
-    if (!connection) return; // console.error("openDatatunnel.nope", hostname);
 
-    // console.log("openDatatunnel", connection?.clientId);
+    console.log("openDatatunnel for host " + hostname + "\nwith request " + JSON.stringify(request) + "\navailable connections: "+ JSON.stringify(proxy.listConnections().map((conn) => conn.hostname)));
+
+    const connection: Connection = proxy.findConnectionByHostname(hostname);
+
+    if (!connection) {
+        console.log("connection failed. COnnections: " + JSON.stringify(proxy.listConnections().map((conn) => conn.hostname)));
+        return; // console.error("openDatatunnel.nope", hostname);
+    }
+
+    console.log("openDatatunnel", connection?.clientId);
 
     // Register this data tunnel
     const socketId = nanoid();
@@ -163,7 +174,7 @@ function socketOverSocket(
         code,
         data,
       };
-      console.log("websocket.on.close", closed);
+      console.log("websocket.on.close (to client)", closed);
       connection.websocket.sendMessage(closed);
     });
 
@@ -176,6 +187,7 @@ function socketOverSocket(
         type: "WebSocketHostMessage",
         data: text,
       };
+      console.log("websocket.on.message (to client)", forward);
       connection.websocket.sendMessage(forward);
     });
 
